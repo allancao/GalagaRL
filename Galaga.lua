@@ -1,9 +1,3 @@
-while true do
-	if gameinfo.getromname() == "Galaga" then
-		getCurrentState();
-	emu.frameadvance();
-end
-
 BULLET_READY = 0
 STATES = {}
 LEFT_EDGE = 7
@@ -14,6 +8,7 @@ RIGHT_EDGE = 183
 	range 0 - 2, concatenated with current ship position. Gives about 531 possible
 	states. Possible actions per state are to move left, move right, stay in 
 	current position, or shoot. All values are initialzied to zero. ]]
+
 function initializeStates()
 	for i = 0,2 do
 		for j = LEFT_EDGE,RIGHT_EDGE do
@@ -26,6 +21,7 @@ end
 	Bullet flags are from 120 to 0. Only two bullets can coexist at any point in time.
 	BULLET_READY signifies that the bullet has left the map, and is ready to re-enter 
 	map through the shoot functionality. ]]
+
 function getCurrentState() 
 
 	local currentPosition = memory.readbyte(0x0203)
@@ -45,6 +41,7 @@ function getCurrentState()
 end
 
 --[[ Given a state, used to find the action with highest value for Q-learning. ]]
+
 function findMaxAction( state ) 
 
 	local left = STATES[state].left
@@ -63,6 +60,7 @@ function findMaxAction( state )
 end
 
 --[[ Helper method to find max actions. ]]
+
 function getKeyFromValue( t, val )
 	local tempMax = {}
 	for k,v in pairs(t) do
@@ -91,6 +89,7 @@ end
 
 
 --[[ Fancy print method, for extracting sublist elements. ]]
+
 function print_r ( t )  
     local print_r_cache={}
     local function sub_print_r(t,indent)
@@ -125,4 +124,12 @@ function print_r ( t )
     print()
 end
 
+while true do
+	if gameinfo.getromname() == "Galaga" then
+		getCurrentState();
+	emu.frameadvance();
 end
+
+end
+
+
