@@ -25,7 +25,7 @@ end
 function getCurrentState() 
 
 	local currentPosition = memory.readbyte(0x0203)
-	local bulletFlag1 = memory.readbyte(0x02E1)
+	local bulletFlag1 = memory.readbyte(0x02E0)
 	local bulletFlag2 = memory.readbyte(0x02E8)
 
 	if bulletFlag1 == BULLET_READY and bulletFlag2 == BULLET_READY then
