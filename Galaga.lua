@@ -1,28 +1,31 @@
 while true do
-	emu.frameadvance();
 	if gameinfo.getromname() == "Galaga" then
-		buttons = {
-			"Left",
-			"Right",
-			"Fire"
-		}
-
-		i = 7
-
+		getCurrentState();
 	emu.frameadvance();
 end
 
 BULLET_READY = 0
 STATES = {}
+LEFT_EDGE = 7
+RIGHT_EDGE = 183 
 
+
+--[[ Initialize all possible states and values. Possible states use bullets fired, 
+	range 0 - 2, concatenated with current ship position. Gives about 531 possible
+	states. Possible actions per state are to move left, move right, stay in 
+	current position, or shoot. All values are initialzied to zero. ]]
 function initializeStates()
 	for i = 0,2 do
-		for j = 7,183 do
+		for j = LEFT_EDGE,RIGHT_EDGE do
 			STATES[i .. j] = {left = 0, right = 0, stay = 0, shoot = 0}
 		end
 	end
 end
 
+--[[ Grabs current bullet and position. Position ranges from LEFT_EDGE to RIGHT_EDGE. 
+	Bullet flags are from 120 to 0. Only two bullets can coexist at any point in time.
+	BULLET_READY signifies that the bullet has left the map, and is ready to re-enter 
+	map through the shoot functionality. ]]
 function getCurrentState() 
 
 	local currentPosition = memory.readbyte(0x0203)
@@ -41,6 +44,7 @@ function getCurrentState()
 
 end
 
+--[[ Given a state, used to find the action with highest value for Q-learning. ]]
 function findMaxAction( state ) 
 
 	local left = STATES[state].left
@@ -50,37 +54,43 @@ function findMaxAction( state )
 
 	local tempMax = left
 
-	if tempMax < right tempMax = right end
-	if tempMax < stay tempMax = stay end
-	if tempMax < shoot tempmax = shoot end
+	if tempMax < right then tempMax = right end
+	if tempMax < stay then tempMax = stay end
+	if tempMax < shoot then tempmax = shoot end
 
 	return getKeyFromValue( STATES[state], tempMax)
 
 end
 
+--[[ Helper method to find max actions. ]]
 function getKeyFromValue( t, val )
 	local tempMax = {}
 	for k,v in pairs(t) do
 		if v == val then table.insert(tempMax,k) end
 	end
+
 	if table.getn(tempMax) > 1 then
 		local randomNum = math.random(0,table.getn(tempmax)+1)
 		return table.remove(tempMax, randomNum)
+	end
 	return nil
 end
 
 function chooseAction( state )
 	local maxQ = findMaxAction(state)
-	return 
+	return maxQ
+end 
 
 function moveLeft( pos )
-	if pos != 7 then pos = pos - 1 end
+	if not(pos == LEFT_EDGE) then pos = pos - 1 end
 end
 
 function moveRight( pos )
-	if pos != 183 then pos = pos + 1 end
+	if not(pos == RIGHT_EDGE) then pos = pos + 1 end
 end
 
+
+--[[ Fancy print method, for extracting sublist elements. ]]
 function print_r ( t )  
     local print_r_cache={}
     local function sub_print_r(t,indent)
@@ -113,4 +123,6 @@ function print_r ( t )
         sub_print_r(t,"  ")
     end
     print()
+end
+
 end
