@@ -1,17 +1,13 @@
-SystemID NES
-00E0	b	u	0	RAM	9xxxxxx
-00E1	b	u	0	RAM	x9xxxxx
-00E2	b	u	0	RAM	xx9xxxx
-00E3	b	u	0	RAM	xxx9xxx
-00E4	b	u	0	RAM	xxxx9xx
-00E5	b	u	0	RAM	xxxxx9x
-00E6	b	u	0	RAM	xxxxxx9
-0203	b	u	0	RAM	p1 position
-02E0	b	u	0	RAM	bullet 1 flag
-02E1	b	u	0	RAM	bullet 1 y pos
-02E2	b	u	0	RAM	bullet 1 x pos
-02E8	b	u	0	RAM	bullet 2 flag
-02E9	b	u	0	RAM	bullet 2 y pos
-02EA	b	u	0	RAM	bullet 2 x pos
-0487	b	u	0	RAM	current player lives
 
+11
+00000	00E0	b	s	0	0xxxxxx
+00001	00E1	b	s	0	x9xxxxx
+00002	00E2	b	s	0	xx9xxxx
+00003	00E3	b	s	0	xxx9xxx
+00004	00E4	b	s	0	xxxx9xx
+00005	00E5	b	s	0	xxxxx9x
+00006	00E6	b	s	0	xxxxxx9
+00007	0203	b	u	0	pos
+00008	0487	b	u	0	current lives
+00009	02E0	b	u	0	bullet 1 flag
+0000A	02E8	b	u	0	bullet 2 flag
