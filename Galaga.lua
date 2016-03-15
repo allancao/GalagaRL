@@ -125,11 +125,8 @@ function print_r ( t )
 end
 
 while true do
-	if gameinfo.getromname() == "Galaga" then
-		getCurrentState();
+	emu.print(getCurrentState())
 	emu.frameadvance();
-end
-
 end
 
 
