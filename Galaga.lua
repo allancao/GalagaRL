@@ -50,11 +50,6 @@ function findMaxAction( state )
 	local stay = STATES[state].stay
 	local shoot = STATES[state].shoot
 
-	emu.print(left)
-	emu.print(right)
-	emu.print(stay)
-	emu.print(shoot)
-
 	local tempMax = left
 
 	if tempMax < right then tempMax = right end
@@ -65,9 +60,51 @@ function findMaxAction( state )
 
 end
 
-function possibleMoves( state ) {
-	
-}
+function possibleMoves( state ) 
+    local bullets_shot = tonumber(string.sub(state, 0, 1))
+    local position = tonumber(string.sub(state, 2, string.len(state)))
+	local tempMoves = {}
+	local possibleBullets = {}
+
+	if bullets_shot == 0 then
+		table.insert(possibleBullets, 0)
+	elseif bullets_shot == 1 then
+		table.insert(possibleBullets, 0)
+		table.insert(possibleBullets, 1)
+	elseif bullets_shot == 2 then
+		table.insert(possibleBullets, 1)
+		table.insert(possibleBullets, 2)
+	end
+
+	--[[ Stay action ]]
+	for k,v in pairs(possibleBullets) do
+    	table.insert(tempMoves, tostring(v) + tostring(position))
+	end
+
+	--[[ left action ]]
+	if not(position == LEFT_EDGE) then
+		for k,v in pairs(possibleBullets) do
+			table.insert(tempMoves, tostring(v) + tostring(position - 1))
+		end
+	end
+
+	--[[ right action ]]
+	if not(position == RIGHT_EDGE) then
+		for k,v in pairs(possibleBullets) do
+			table.insert(tempMoves, tostring(v) + tostring(position + 1))
+		end
+	end
+
+	--[[ Shoot action ]]
+	if bullets_shot == 0 then
+		table.insert(tempMoves, "1" + tostring(position))
+	elseif bullets_shot == 1 then
+		table.insert(tempMoves, "1" + tostring(position))
+		table.insert(tempMoves, "2" + tostring(position))
+	end
+
+	return tempMoves
+end
 
 --[[ Helper method to find max actions. ]]
 
@@ -88,10 +125,10 @@ function chooseAction( state )
 	return maxQ
 end 
 
-function update( state, oldValue, reward, discount, lrnRate )
+-- function update( state, oldValue, reward, discount, lrnRate )
 
-	return oldValue + lrnRate * (reward + discount * )
-end
+-- 	return oldValue + lrnRate * (reward + discount * )
+-- end
 
 function moveLeft( pos )
 	if not(pos == LEFT_EDGE) then pos = pos - 1 end
@@ -153,7 +190,8 @@ initializeStates()
 -- emu.print(keyset)
 
 while true do
-	emu.print(chooseAction(getCurrentState()))
+	emu.print(getCurrentState())
+	emu.print(possibleMoves(getCurrentState()))
 	emu.frameadvance();
 end
 
