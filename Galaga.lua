@@ -1,4 +1,4 @@
-BULLET_READY = 0
+BULLET_READY = 128
 STATES = {}
 LEFT_EDGE = 7
 RIGHT_EDGE = 183
@@ -78,20 +78,20 @@ function possibleMoves( state )
 
 	--[[ Stay action ]]
 	for k,v in pairs(possibleBullets) do
-    	table.insert(tempMoves, tostring(v) + tostring(position))
+    	table.insert(tempMoves, tostring(k) .. tostring(position))
 	end
 
 	--[[ left action ]]
 	if not(position == LEFT_EDGE) then
 		for k,v in pairs(possibleBullets) do
-			table.insert(tempMoves, tostring(v) + tostring(position - 1))
+			table.insert(tempMoves, tostring(k) .. tostring(position - 1))
 		end
 	end
 
 	--[[ right action ]]
 	if not(position == RIGHT_EDGE) then
 		for k,v in pairs(possibleBullets) do
-			table.insert(tempMoves, tostring(v) + tostring(position + 1))
+			table.insert(tempMoves, tostring(k) .. tostring(position + 1))
 		end
 	end
 
