@@ -1,7 +1,8 @@
 BULLET_READY = 0
 STATES = {}
 LEFT_EDGE = 7
-RIGHT_EDGE = 183 
+RIGHT_EDGE = 183
+EPSILON = 0.09
 
 
 --[[ Initialize all possible states and values. Possible states use bullets fired, 
@@ -49,6 +50,11 @@ function findMaxAction( state )
 	local stay = STATES[state].stay
 	local shoot = STATES[state].shoot
 
+	emu.print(left)
+	emu.print(right)
+	emu.print(stay)
+	emu.print(shoot)
+
 	local tempMax = left
 
 	if tempMax < right then tempMax = right end
@@ -59,6 +65,10 @@ function findMaxAction( state )
 
 end
 
+function possibleMoves( state ) {
+	
+}
+
 --[[ Helper method to find max actions. ]]
 
 function getKeyFromValue( t, val )
@@ -68,16 +78,20 @@ function getKeyFromValue( t, val )
 	end
 
 	if table.getn(tempMax) > 1 then
-		local randomNum = math.random(0,table.getn(tempmax)+1)
+		local randomNum = math.random(1,table.getn(tempMax))
 		return table.remove(tempMax, randomNum)
 	end
-	return nil
 end
 
 function chooseAction( state )
 	local maxQ = findMaxAction(state)
 	return maxQ
 end 
+
+function update( state, oldValue, reward, discount, lrnRate )
+
+	return oldValue + lrnRate * (reward + discount * )
+end
 
 function moveLeft( pos )
 	if not(pos == LEFT_EDGE) then pos = pos - 1 end
@@ -124,8 +138,22 @@ function print_r ( t )
     print()
 end
 
+-- [[Main Method]]
+
+initializeStates()
+
+-- local keyset={}
+-- local n=0
+
+-- for k,v in pairs(STATES) do
+--   n=n+1
+--   keyset[n]=v
+-- end
+
+-- emu.print(keyset)
+
 while true do
-	emu.print(getCurrentState())
+	emu.print(chooseAction(getCurrentState()))
 	emu.frameadvance();
 end
 
