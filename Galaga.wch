@@ -8,6 +8,6 @@
 00005	00E5	b	s	0	xxxxx9x
 00006	00E6	b	s	0	xxxxxx9
 00007	0203	b	u	0	pos
-00008	0487	b	u	0	current lives
-00009	02E0	b	u	0	bullet 1 flag
-0000A	02E8	b	u	0	bullet 2 flag
+00008	02E0	b	u	0	bullet 1 flag
+00009	02E8	b	u	0	bullet 2 flag
+0000A	0485	b	u	0	current lives
