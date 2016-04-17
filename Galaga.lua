@@ -1,10 +1,12 @@
 BULLET_READY = 128
 STATES = {}
 LEFT_EDGE = 7
-RIGHT_EDGE = 183
-EPSILON = 0.09
+RIGHT_EDGE = 184
 INPUTS = {A=false, up=false, left=false, B=false, select=false, right=false, down=false, start=false}
 STATE = nil
+EPSILON = 0.9
+DISCOUNT = 0.5
+LRNRATE = 0.5
 
 --[[ Initialize all possible states and values. Possible states use bullets fired, 
 	range 0 - 2, concatenated with current ship position. Gives about 531 possible
@@ -91,14 +93,14 @@ function possibleMoves( state )
 	end
 
 	--[[ left action ]]
-	if not(position == LEFT_EDGE) then
+	if not(position == LEFT_EDGE + 2) then
 		for k,v in pairs(possibleBullets) do
 			table.insert(tempMoves, tostring(v) .. tostring(position - 1))
 		end
 	end
 
 	--[[ right action ]]
-	if not(position == RIGHT_EDGE) then
+	if not(position == RIGHT_EDGE - 2) then
 		for k,v in pairs(possibleBullets) do
 			table.insert(tempMoves, tostring(v) .. tostring(position + 1))
 		end
@@ -148,11 +150,11 @@ function update( state, reward, discount, lrnRate )
 
 	local newValue = currentValue + lrnRate * (reward + (discount * tempMaxValue) - currentValue)  
 	updateQValue(state, currentAction, newValue)
-	emu.print("STATE: " .. state)
-	emu.print(STATES[state])
-	emu.print("REWARD: " .. reward)
-	emu.print("CURRENTVALUE: " .. currentValue)
-	emu.print("NEWVALUE: " .. newValue)
+	-- emu.print("STATE: " .. state)
+	-- emu.print(STATES[state])
+	-- emu.print("REWARD: " .. reward)
+	-- emu.print("CURRENTVALUE: " .. currentValue)
+	-- emu.print("NEWVALUE: " .. newValue)
 
 end
 
@@ -172,21 +174,37 @@ function getQValue( state, action )
 end
 
 function takeAction( state )
+    local position = tonumber(string.sub(state, 2, string.len(state)))
 	local random = math.random()
 	if random > EPSILON then 
 		local maxQ = findMaxAction(state)
-		if maxQ == "left" then moveLeft()
-		elseif maxQ == "right" then moveRight()
+		if maxQ == "left" and not(position == LEFT_EDGE + 2) then moveLeft()
+		elseif maxQ == "right" and not(position == RIGHT_EDGE - 2) then moveRight()
 		elseif maxQ == "shoot" then shoot()
 		end
 	else
-		random = math.random()
-		if random <= .333 then moveLeft()
-		elseif random > .333 and random < .666 then moveRight()
-		else shoot()
-		end
+		takeRandomAction(position)
+		-- random = math.random()
+		-- if random <= .333 not(position == LEFT_EDGE + 2) then moveLeft()
+		-- elseif random > .333 and random < .666 and not(position == RIGHT_EDGE - 2) then moveRight()
+		-- else shoot()
+		-- end
 	end
 end 
+
+function takeRandomAction( position )
+
+	local possibleMoves = {}
+	table.insert(possibleMoves, "shoot")
+	if not(position == LEFT_EDGE + 2) then table.insert(possibleMoves, "left") end
+	if not(position == RIGHT_EDGE - 2) then table.insert(possibleMoves, "right") end
+
+	local randomAction = possibleMoves[math.random(1, table.getn(possibleMoves))]
+	if randomAction == "left" then moveLeft()
+	elseif randomAction == "right" then moveRight()
+	elseif randomAction == "shoot" then shoot()
+	end
+end
 
 -- {A=false, up=false, left=false, B=false, select=false, right=false, down=false, start=false}
 function moveLeft()
@@ -302,29 +320,39 @@ end
 -- [[Main Method]]
 
 initializeStates()
+emu.speedmode("maximum")
+local count = 0
 local reward = 0
+local file_index = 0
 while true do
 	reset()
-	emu.print("GETCURRENTSTATE")
-	emu.print(getCurrentState())
-	local discount = 0.9
-	local lrnRate = 0.1
-
 	if memory.readbyte(0x0485) == 2 then 
 		-- reward = reward + 5
 	else
 		-- table.saveTable( STATES , "states_table.txt" )
-		file = io.open ("states.txt", "a")
+		file = io.open ("0/states_" .. file_index .. ".txt", "a")
 		io.output(file)
+		io.write("\n\nITERATION NO. " .. count .. " SCORE: " .. calculateScore() .. "\n\n")
 		io.write(table.tostring(STATES))
 		io.close()
-		emu.print(STATES)
+		count = count + 1
+		update(getCurrentState(), -10, DISCOUNT, LRNRATE)
 		savestate.load(STATE)
+
+		if (count % 1000) == 0 then
+			file_index = file_index + 1
+			if EPSILON > 0 then EPSILON = EPSILON - 0.05 end
+		end 
 	end
 
-	if calculateScore() > reward then reward = calculateScore() - reward end
+	if calculateScore() > reward then 
+		-- reward = calculateScore() - reward 
+		reward = calculateScore()
+		update(getCurrentState(), 1, DISCOUNT, LRNRATE)
+	else
+		update(getCurrentState(), 0, DISCOUNT, LRNRATE)
+	end
 
-	update(getCurrentState(), reward, discount, lrnRate)
 	takeAction(getCurrentState())
 
 	-- local maxAction, actionValue = findMaxAction(getCurrentState())
